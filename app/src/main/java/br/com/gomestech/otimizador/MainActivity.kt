@@ -1,5 +1,7 @@
 package br.com.gomestech.otimizador
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -92,7 +94,9 @@ class MainActivity : AppCompatActivity() {
             botao.isEnabled = true
             if (apk == null) {
                 txt.text = getString(R.string.update_titulo, v.nome)
+                // Plano B: baixa pelo navegador (ele tem certificados e rede próprios).
                 Toast.makeText(this@MainActivity, R.string.update_erro, Toast.LENGTH_LONG).show()
+                abrirComSeguranca(Intent(Intent.ACTION_VIEW, Uri.parse(v.urlApk)))
             } else {
                 txt.text = getString(R.string.update_titulo, v.nome)
                 Atualizador.instalar(this@MainActivity, apk)

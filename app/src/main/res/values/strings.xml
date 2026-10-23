@@ -13,7 +13,7 @@
     <string name="update_titulo">Nova versão disponível: %1$s</string>
     <string name="update_botao">Atualizar</string>
     <string name="update_baixando">Baixando atualização… %1$d%%</string>
-    <string name="update_erro">Não foi possível baixar a atualização. Tente de novo.</string>
+    <string name="update_erro">Não deu para baixar por aqui. Vou abrir o download no navegador: depois é só tocar no arquivo baixado.</string>
     <string name="update_permissao">Para atualizar, permita “Instalar apps desconhecidos” para o GomesTech Otimizador e toque em Atualizar de novo.</string>
 
     <string name="permissao_uso_texto">Para ver o tamanho do cache e quais apps você não usa, o Android pede que você libere o “Acesso ao uso” para o GomesTech Otimizador.</string>

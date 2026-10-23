@@ -35,11 +35,15 @@ adb shell input keyevent 82 || true
 adb shell appops set $PKG GET_USAGE_STATS allow || true
 adb logcat -c || true
 set +e
-adb shell monkey -p $PKG --pct-syskeys 0 --pct-appswitch 0 --throttle 100 -s 2026 -v 3000 > resultados/monkey.txt 2>&1
+# --ignore-crashes: se OUTRO app do sistema (teclado, tela inicial...) falhar no emulador,
+# o teste continua. Falhas do NOSSO app continuam reprovando (verificação abaixo pelo logcat).
+adb shell monkey -p $PKG --pct-syskeys 0 --pct-appswitch 0 --ignore-crashes --ignore-timeouts --throttle 100 -s 2026 -v 3000 > resultados/monkey.txt 2>&1
 RESULT_MONKEY=$?
 set -e
 adb logcat -d > resultados/logcat-estresse.txt || true
 tail -n 20 resultados/monkey.txt
+echo "--- Falhas registradas durante o estresse (qualquer app) ---"
+grep -E "// CRASH|// NOT RESPONDING|ANR in" resultados/monkey.txt resultados/logcat-estresse.txt | head -20 || true
 
 CRASH_LOGCAT=$(grep -A 3 "FATAL EXCEPTION" resultados/logcat-estresse.txt | grep -c "Process: $PKG" || true)
 if grep -q "// CRASH: $PKG" resultados/monkey.txt || [ "${CRASH_LOGCAT:-0}" -gt 0 ]; then
@@ -47,7 +51,7 @@ if grep -q "// CRASH: $PKG" resultados/monkey.txt || [ "${CRASH_LOGCAT:-0}" -gt 
   grep -A 25 "FATAL EXCEPTION" resultados/logcat-estresse.txt | head -60 || true
   exit 1
 fi
-if grep -q "// NOT RESPONDING: $PKG" resultados/monkey.txt; then
+if grep -q "// NOT RESPONDING: $PKG" resultados/monkey.txt || grep -q "ANR in $PKG" resultados/logcat-estresse.txt; then
   echo "::error::O app travou (ANR) durante o teste de estresse."
   exit 1
 fi

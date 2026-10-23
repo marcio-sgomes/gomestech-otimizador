@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Celulares antigos (Android 7) têm a lista de certificados de segurança desatualizada
+  e não conseguem baixar a atualização do GitHub. Aqui somamos às raízes do sistema
+  a lista oficial da Mozilla (a mesma usada pelo Firefox), sem permitir nada inseguro:
+  só HTTPS, nada de tráfego aberto.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/raizes_mozilla" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

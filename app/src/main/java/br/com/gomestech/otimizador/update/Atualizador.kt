@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.core.content.FileProvider
 import br.com.gomestech.otimizador.BuildConfig
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,13 @@ import java.net.URL
  */
 object Atualizador {
 
+    private const val TAG = "GomesTechAtualizacao"
+
+    /** Motivo da última falha (aparece no log e ajuda a corrigir problemas). */
+    @Volatile
+    var ultimoErro: String? = null
+        private set
+
     private val urlUltima: String
         get() = "https://api.github.com/repos/${BuildConfig.UPDATE_REPO}/releases/latest"
 
@@ -37,13 +45,18 @@ object Atualizador {
                     setRequestProperty("Accept", "application/vnd.github+json")
                 }
                 try {
-                    if (con.responseCode != 200) return@withContext null
+                    if (con.responseCode != 200) {
+                        ultimoErro = "consulta respondeu ${con.responseCode}"
+                        return@withContext null
+                    }
                     val texto = con.inputStream.bufferedReader().use { it.readText() }
                     Versao.interpretar(texto, versaoAtual)
                 } finally {
                     con.disconnect()
                 }
             } catch (e: Exception) {
+                ultimoErro = "consulta: ${e.javaClass.simpleName}: ${e.message}"
+                Log.w(TAG, "Falha ao consultar versão", e)
                 null
             }
         }
@@ -76,7 +89,10 @@ object Atualizador {
                     con.readTimeout = 30_000
                     redirecionamentos++
                 }
-                if (con.responseCode != 200) return@withContext null
+                if (con.responseCode != 200) {
+                    ultimoErro = "download respondeu ${con.responseCode}"
+                    return@withContext null
+                }
                 val total = con.contentLengthLong
                 con.inputStream.use { entrada ->
                     destino.outputStream().use { saida ->
@@ -102,11 +118,14 @@ object Atualizador {
                 // Confere se o arquivo baixado é mesmo um APK inteiro.
                 val inicio = destino.inputStream().use { entrada -> ByteArray(2).also { entrada.read(it) } }
                 if (!Versao.pareceApk(inicio, destino.length())) {
+                    ultimoErro = "arquivo baixado não é um APK (${destino.length()} bytes)"
                     destino.delete()
                     return@withContext null
                 }
                 destino
             } catch (e: Exception) {
+                ultimoErro = "download: ${e.javaClass.simpleName}: ${e.message}"
+                Log.w(TAG, "Falha ao baixar a atualização", e)
                 destino.delete()
                 null
             }

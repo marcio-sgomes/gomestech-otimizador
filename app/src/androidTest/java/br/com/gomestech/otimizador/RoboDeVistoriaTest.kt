@@ -361,14 +361,14 @@ class RoboDeVistoriaTest {
         assumeTrue("Limite de consultas do GitHub quase no fim ($restantes)", restantes >= 5)
 
         val lanc = runBlocking { Atualizador.verificar(versaoAtual = 0) }
-        assertNotNull("Não encontrou a versão publicada", lanc)
+        assertNotNull("Não encontrou a versão publicada: ${Atualizador.ultimoErro}", lanc)
         assertTrue(lanc!!.urlApk.endsWith(".apk"))
 
         // Já atualizado: não oferece nada.
         assertEquals(null, runBlocking { Atualizador.verificar(versaoAtual = lanc.codigo) })
 
         val apk = runBlocking { Atualizador.baixar(ctx, lanc) { } }
-        assertNotNull("O download do APK falhou", apk)
+        assertNotNull("O download do APK falhou: ${Atualizador.ultimoErro}", apk)
         assertTrue("APK pequeno demais", apk!!.length() > 1_000_000)
         apk.delete()
 
