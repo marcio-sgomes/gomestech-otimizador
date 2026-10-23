@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GomesTech Otimizador</title>
+<meta name="description" content="Deixe seu celular Android mais leve e com mais bateria — sem anúncios e sem promessas falsas.">
+<style>
+  :root { --brand:#0D7A5F; --brand2:#08533F; --accent:#F5A623; --bg:#F4F7F6; --card:#fff; --txt:#1b2421; --sub:#5b6b66; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1513; --card:#18211e; --txt:#e8efec; --sub:#9db0a9; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--txt); }
+  header { background:linear-gradient(135deg,var(--brand),var(--brand2)); color:#fff; padding:40px 16px 56px; text-align:center; }
+  header h1 { margin:8px 0 4px; font-size:1.8rem; }
+  header p { margin:0; opacity:.9; }
+  .logo { width:72px; height:72px; border-radius:50%; background:#fff2; display:inline-grid; place-items:center; font-size:38px; }
+  main { max-width:640px; margin:-32px auto 0; padding:0 16px 32px; }
+  .card { background:var(--card); border-radius:16px; padding:20px; margin-bottom:16px; box-shadow:0 2px 10px #0001; }
+  .btn { display:block; text-align:center; background:var(--accent); color:#000; font-weight:700; text-decoration:none; padding:16px; border-radius:12px; font-size:1.1rem; }
+  ol, ul { padding-left:20px; line-height:1.6; }
+  .sub { color:var(--sub); font-size:.92rem; }
+  .hide { display:none; }
+  #qr { display:grid; place-items:center; margin:12px 0; }
+  footer { text-align:center; color:var(--sub); font-size:.85rem; padding:16px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⚡</div>
+  <h1>GomesTech Otimizador</h1>
+  <p>Mais espaço e mais bateria no seu Android — sem anúncios, sem enganação.</p>
+</header>
+
+<main>
+  <!-- ANDROID -->
+  <section id="android" class="hide">
+    <div class="card">
+      <a class="btn" id="baixar" href="#">Baixar o app (APK)</a>
+      <p class="sub">Funciona em Samsung, Motorola, Xiaomi/Redmi/POCO, Realme, OPPO, OnePlus, Vivo, Asus, LG, Nokia, Pixel e outros — Android 7 ou mais novo.</p>
+    </div>
+    <div class="card">
+      <strong>Como instalar</strong>
+      <ol>
+        <li>Toque em <b>Baixar o app</b> e espere terminar.</li>
+        <li>Abra o arquivo baixado. Se o celular pedir, permita <b>“Instalar apps desconhecidos”</b> para o navegador.</li>
+        <li>Toque em <b>Instalar</b>. Pronto!</li>
+      </ol>
+      <p class="sub">Depois disso, as atualizações aparecem sozinhas dentro do app, com o botão <b>Atualizar</b>.</p>
+    </div>
+  </section>
+
+  <!-- IPHONE -->
+  <section id="iphone" class="hide">
+    <div class="card">
+      <strong>Este app é só para Android</strong>
+      <p>A Apple não permite que apps limpem ou mexam nas configurações do iPhone. Mas dá para deixar o seu mais leve assim:</p>
+      <ul>
+        <li><b>Ajustes → Geral → Armazenamento do iPhone</b>: ative “Desinstalar Apps não Usados”.</li>
+        <li>Na mesma tela, toque nos apps grandes e use <b>Desinstalar App</b> (mantém seus dados).</li>
+        <li><b>Ajustes → Bateria → Saúde e Carregamento</b>: ative o carregamento otimizado; abaixo de 80% vale trocar a bateria.</li>
+        <li>No WhatsApp: <b>Configurações → Armazenamento e dados → Gerenciar armazenamento</b>.</li>
+        <li>Reinicie o iPhone uma vez por semana e mantenha o iOS atualizado.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PC -->
+  <section id="pc" class="hide">
+    <div class="card">
+      <strong>Abra no seu celular Android</strong>
+      <p>Aponte a câmera do celular para o código abaixo para baixar o app:</p>
+      <div id="qr"></div>
+      <a class="btn" id="baixarPc" href="#">Ou baixe o APK aqui e passe para o celular</a>
+    </div>
+  </section>
+
+  <div class="card">
+    <strong>O que o app faz</strong>
+    <ul>
+      <li>Nota de saúde do celular, com o que fazer para melhorar</li>
+      <li>Limpeza de cache guiada (vai direto na tela certa de cada app)</li>
+      <li>Apps esquecidos: o que você não usa há 30, 60 ou 90 dias</li>
+      <li>Fotos, vídeos e áudios grandes, inclusive do WhatsApp</li>
+      <li>Bateria: temperatura, saúde e atalhos para as telas da sua marca</li>
+      <li>Checklist semanal com lembrete</li>
+    </ul>
+    <p class="sub">Tudo fica no seu celular. Nenhum dado é enviado para lugar nenhum.</p>
+  </div>
+</main>
+
+<footer>© <span id="ano"></span> GomesTech — feito por Márcio Gomes</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  // Repositório no GitHub onde ficam as versões do app (dono/repositorio).
+  var REPO = "marcio-sgomes/gomestech-otimizador";
+  var APK = "https://github.com/" + REPO + "/releases/latest/download/GomesTech-Otimizador.apk";
+
+  document.getElementById("ano").textContent = new Date().getFullYear();
+  document.getElementById("baixar").href = APK;
+  document.getElementById("baixarPc").href = APK;
+
+  var ua = navigator.userAgent || "";
+  var iPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  var tipo = /android/i.test(ua) ? "android" : (/iphone|ipad|ipod/i.test(ua) || iPadOS) ? "iphone" : "pc";
+  document.getElementById(tipo).classList.remove("hide");
+
+  if (tipo === "pc" && window.QRCode) {
+    new QRCode(document.getElementById("qr"), { text: location.href, width: 180, height: 180 });
+  }
+</script>
+</body>
+</html>

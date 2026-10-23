@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_painel" android:icon="@drawable/ic_painel" android:title="@string/nav_painel" />
+    <item android:id="@+id/nav_limpeza" android:icon="@drawable/ic_limpeza" android:title="@string/nav_limpeza" />
+    <item android:id="@+id/nav_apps" android:icon="@drawable/ic_apps" android:title="@string/nav_apps" />
+    <item android:id="@+id/nav_arquivos" android:icon="@drawable/ic_arquivos" android:title="@string/nav_arquivos" />
+    <item android:id="@+id/nav_bateria" android:icon="@drawable/ic_bateria" android:title="@string/nav_bateria" />
+</menu>

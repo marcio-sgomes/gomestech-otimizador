@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GomesTech Otimizador</string>
+
+    <string name="nav_painel">Painel</string>
+    <string name="nav_limpeza">Limpeza</string>
+    <string name="nav_apps">Apps</string>
+    <string name="nav_arquivos">Arquivos</string>
+    <string name="nav_bateria">Bateria</string>
+
+    <string name="rodape">© %1$d GomesTech — feito por Márcio Gomes</string>
+
+    <string name="update_titulo">Nova versão disponível: %1$s</string>
+    <string name="update_botao">Atualizar</string>
+    <string name="update_baixando">Baixando atualização… %1$d%%</string>
+    <string name="update_erro">Não foi possível baixar a atualização. Tente de novo.</string>
+    <string name="update_permissao">Para atualizar, permita “Instalar apps desconhecidos” para o GomesTech Otimizador e toque em Atualizar de novo.</string>
+
+    <string name="permissao_uso_texto">Para ver o tamanho do cache e quais apps você não usa, o Android pede que você libere o “Acesso ao uso” para o GomesTech Otimizador.</string>
+    <string name="permissao_uso_botao">Liberar acesso</string>
+    <string name="permissao_midia_texto">Para encontrar fotos, vídeos e áudios grandes, permita o acesso às mídias.</string>
+    <string name="permissao_midia_botao">Permitir</string>
+
+    <string name="carregando">Analisando…</string>
+    <string name="atualizar_lista">Analisar de novo</string>
+    <string name="limpar_cache">Limpar cache</string>
+    <string name="desinstalar">Desinstalar</string>
+    <string name="apagar">Apagar</string>
+    <string name="abrir">Abrir</string>
+    <string name="ok">Entendi</string>
+    <string name="cancelar">Cancelar</string>
+</resources>
