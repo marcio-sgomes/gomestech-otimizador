@@ -22,6 +22,19 @@ android {
         versionCode = appVersionCode
         versionName = "1.0.$appVersionCode"
         buildConfigField("String", "UPDATE_REPO", "\"$updateRepo\"")
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    testOptions {
+        animationsDisabled = true
+        unitTests.isReturnDefaultValues = false
+    }
+
+    lint {
+        abortOnError = true
+        checkReleaseBuilds = true
+        warningsAsErrors = false
+        // Relatório em app/build/reports/lint-results-debug.html
     }
 
     signingConfigs {
@@ -36,6 +49,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = false
             signingConfig = if (hasReleaseKey) signingConfigs.getByName("release")
@@ -65,4 +81,18 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    // Versão que as bibliotecas de teste esperam (evita erro "Trace.isEnabled" nos emuladores)
+    implementation("androidx.tracing:tracing:1.1.0")
+
+    // Testes da lógica (rodam no computador do GitHub)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
+
+    // Robô de vistoria (roda nos emuladores Android)
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:core-ktx:1.6.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:rules:1.6.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
 }

@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment
 import br.com.gomestech.otimizador.R
 import br.com.gomestech.otimizador.data.Aparelho
 import br.com.gomestech.otimizador.data.Marcas
+import br.com.gomestech.otimizador.logica.Saude
+import br.com.gomestech.otimizador.logica.Texto
 import br.com.gomestech.otimizador.reminder.Checklist
 import br.com.gomestech.otimizador.reminder.Lembrete
 import br.com.gomestech.otimizador.util.Formato
@@ -71,22 +73,18 @@ class PainelFragment : Fragment() {
 
         val nota = Aparelho.nota(ctx)
         v.findViewById<TextView>(R.id.txtNota).apply {
-            text = nota.valor.toString()
+            text = nota.nota.toString()
             setTextColor(
                 ContextCompat.getColor(
-                    ctx, when {
-                        nota.valor >= 80 -> R.color.ok
-                        nota.valor >= 50 -> R.color.warn
-                        else -> R.color.bad
+                    ctx, when (Saude.faixa(nota.nota)) {
+                        Saude.Faixa.BOA -> R.color.ok
+                        Saude.Faixa.MEDIA -> R.color.warn
+                        Saude.Faixa.RUIM -> R.color.bad
                     }
                 )
             )
         }
-        v.findViewById<TextView>(R.id.txtNotaDescricao).text = when {
-            nota.valor >= 80 -> "Seu celular está saudável"
-            nota.valor >= 50 -> "Seu celular precisa de alguns cuidados"
-            else -> "Seu celular precisa de atenção"
-        }
+        v.findViewById<TextView>(R.id.txtNotaDescricao).text = Saude.descricao(nota.nota)
         v.findViewById<TextView>(R.id.txtAparelho).text = Aparelho.descricao()
 
         val arm = Aparelho.armazenamento()
@@ -103,7 +101,7 @@ class PainelFragment : Fragment() {
 
         val b = Aparelho.bateria(ctx)
         v.findViewById<TextView>(R.id.txtBateriaResumo).text = if (b == null) "Não foi possível ler a bateria."
-        else "${b.nivel}% • ${"%.1f".format(b.temperaturaC)} °C • saúde: ${b.saudeTexto}" +
+        else "${b.nivel}% • ${Texto.umaCasa(b.temperaturaC)} °C • saúde: ${b.saudeTexto}" +
             if (b.carregando) " • carregando" else ""
 
         v.findViewById<TextView>(R.id.txtDicas).text =

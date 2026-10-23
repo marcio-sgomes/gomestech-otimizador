@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import br.com.gomestech.otimizador.R
 import br.com.gomestech.otimizador.data.Permissoes
 import br.com.gomestech.otimizador.data.ScannerArquivos
+import br.com.gomestech.otimizador.logica.Texto
 import br.com.gomestech.otimizador.util.Formato
 import br.com.gomestech.otimizador.util.abrirComSeguranca
 import com.google.android.material.chip.Chip
@@ -106,7 +107,7 @@ class ArquivosFragment : BaseListaFragment() {
                 }
             }
             .map {
-                val pasta = it.pasta.trimEnd('/').substringAfterLast('/').ifBlank { "—" }
+                val pasta = Texto.pastaCurta(it.pasta)
                 Linha(
                     id = it.uri.toString(),
                     titulo = it.nome,

@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import br.com.gomestech.otimizador.logica.Versao
 import br.com.gomestech.otimizador.reminder.Lembrete
 import br.com.gomestech.otimizador.ui.AppsFragment
 import br.com.gomestech.otimizador.ui.ArquivosFragment
@@ -23,7 +24,7 @@ import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
-    private var versaoNova: Atualizador.Versao? = null
+    private var versaoNova: Versao.Lancamento? = null
     private var baixando = false
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,6 +1,7 @@
 package br.com.gomestech.otimizador.reminder
 
 import android.content.Context
+import br.com.gomestech.otimizador.logica.Tempo
 import java.util.Calendar
 
 /** Itens do checklist semanal. As marcações zeram sozinhas a cada semana nova. */
@@ -19,7 +20,7 @@ object Checklist {
 
     private fun semanaAtual(): String {
         val c = Calendar.getInstance()
-        return "${c.get(Calendar.YEAR)}-${c.get(Calendar.WEEK_OF_YEAR)}"
+        return Tempo.chaveSemana(c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR))
     }
 
     fun marcado(ctx: Context, chave: String): Boolean {

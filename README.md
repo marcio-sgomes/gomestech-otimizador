@@ -48,6 +48,12 @@ Telas de lista usam o mesmo layout (`res/layout/fragment_lista.xml`) e a mesma b
 O repositório precisa ser **público** para o download e a atualização funcionarem sem login.
 A chave de assinatura fica nos *Secrets* do GitHub — veja [`docs/ASSINATURA.md`](docs/ASSINATURA.md).
 
+## Testes automáticos
+
+Cada versão passa por testes da lógica (100% de cobertura), verificação de segurança,
+robô de vistoria em emuladores Android 7, 8, 10, 12 e 15 e teste de estresse.
+O APK só é publicado se tudo passar. Detalhes em [`docs/TESTES.md`](docs/TESTES.md).
+
 ## Link de instalação
 
 `site/index.html` detecta o aparelho: Android baixa o APK; iPhone mostra o passo a passo de limpeza do iOS

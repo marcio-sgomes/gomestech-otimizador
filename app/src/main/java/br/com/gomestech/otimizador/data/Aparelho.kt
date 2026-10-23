@@ -8,18 +8,20 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import br.com.gomestech.otimizador.logica.Marca
+import br.com.gomestech.otimizador.logica.Saude
 
 /** Lê informações do celular: armazenamento, memória, bateria e modelo. */
 object Aparelho {
 
     data class Armazenamento(val total: Long, val livre: Long) {
         val usado: Long get() = total - livre
-        val porcentagemUsada: Int get() = if (total > 0) ((usado * 100) / total).toInt() else 0
+        val porcentagemUsada: Int get() = Saude.porcentagemUsada(total, livre)
     }
 
     data class Memoria(val total: Long, val disponivel: Long, val baixa: Boolean) {
         val porcentagemUsada: Int
-            get() = if (total > 0) (((total - disponivel) * 100) / total).toInt() else 0
+            get() = Saude.porcentagemUsada(total, disponivel)
     }
 
     data class Bateria(
@@ -82,51 +84,22 @@ object Aparelho {
     }
 
     /** "Samsung SM-A155M • Android 14" */
-    fun descricao(): String {
-        val marca = Build.MANUFACTURER.replaceFirstChar { it.uppercase() }
-        val modelo = if (Build.MODEL.startsWith(Build.MANUFACTURER, ignoreCase = true))
-            Build.MODEL.substring(Build.MANUFACTURER.length).trim() else Build.MODEL
-        return "$marca $modelo • Android ${Build.VERSION.RELEASE}"
-    }
+    fun descricao(): String =
+        Marca.descricaoAparelho(Build.MANUFACTURER ?: "", Build.MODEL ?: "", Build.VERSION.RELEASE ?: "")
 
-    /** Nota de 0 a 100 e os motivos que tiraram pontos. */
-    data class Nota(val valor: Int, val problemas: List<String>)
-
-    fun nota(ctx: Context): Nota {
-        var pontos = 100
-        val problemas = mutableListOf<String>()
-
-        val arm = armazenamento()
-        when {
-            arm.porcentagemUsada >= 90 -> {
-                pontos -= 40
-                problemas += "Armazenamento quase cheio (${arm.porcentagemUsada}%). Isso é o que mais deixa o celular lento: libere espaço em Arquivos e Apps."
-            }
-            arm.porcentagemUsada >= 80 -> {
-                pontos -= 20
-                problemas += "Armazenamento em ${arm.porcentagemUsada}%. O ideal é ficar abaixo de 80–85%."
-            }
-        }
-
-        val mem = memoria(ctx)
-        if (mem.baixa) {
-            pontos -= 15
-            problemas += "Memória RAM no limite agora. Reiniciar o celular ajuda."
-        }
-
-        bateria(ctx)?.let { b ->
-            if (b.temperaturaC >= 40f) {
-                pontos -= 15
-                problemas += "Bateria quente (${"%.1f".format(b.temperaturaC)} °C). Evite usar carregando e tire a capinha se esquentar muito."
-            }
-            if (b.saude != BatteryManager.BATTERY_HEALTH_GOOD &&
-                b.saude != BatteryManager.BATTERY_HEALTH_UNKNOWN
-            ) {
-                pontos -= 20
-                problemas += "Saúde da bateria: ${b.saudeTexto}. Pode ser hora de trocar a bateria."
-            }
-        }
-
-        return Nota(pontos.coerceIn(0, 100), problemas)
+    /** Lê o aparelho e calcula a nota de saúde (as regras ficam em logica/Saude.kt). */
+    fun nota(ctx: Context): Saude.Resultado {
+        val b = bateria(ctx)
+        val saudeRuim = b != null &&
+            b.saude != BatteryManager.BATTERY_HEALTH_GOOD &&
+            b.saude != BatteryManager.BATTERY_HEALTH_UNKNOWN
+        return Saude.calcular(
+            Saude.Entrada(
+                armazenamentoUsadoPct = armazenamento().porcentagemUsada,
+                memoriaBaixa = memoria(ctx).baixa,
+                temperaturaC = b?.temperaturaC,
+                problemaBateria = if (saudeRuim) b?.saudeTexto else null
+            )
+        )
     }
 }

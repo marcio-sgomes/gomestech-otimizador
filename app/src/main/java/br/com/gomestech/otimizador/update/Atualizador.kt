@@ -9,7 +9,8 @@ import androidx.core.content.FileProvider
 import br.com.gomestech.otimizador.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
+import br.com.gomestech.otimizador.logica.Texto
+import br.com.gomestech.otimizador.logica.Versao
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -23,44 +24,29 @@ import java.net.URL
  */
 object Atualizador {
 
-    data class Versao(val codigo: Int, val nome: String, val urlApk: String, val novidades: String)
-
     private val urlUltima: String
         get() = "https://api.github.com/repos/${BuildConfig.UPDATE_REPO}/releases/latest"
 
     /** Devolve a versão nova, ou null se o app já está atualizado (ou sem internet). */
-    suspend fun verificar(): Versao? = withContext(Dispatchers.IO) {
-        try {
-            val con = (URL(urlUltima).openConnection() as HttpURLConnection).apply {
-                connectTimeout = 10_000
-                readTimeout = 10_000
-                setRequestProperty("Accept", "application/vnd.github+json")
-            }
+    suspend fun verificar(versaoAtual: Int = BuildConfig.VERSION_CODE): Versao.Lancamento? =
+        withContext(Dispatchers.IO) {
             try {
-                if (con.responseCode != 200) return@withContext null
-                val json = JSONObject(con.inputStream.bufferedReader().use { it.readText() })
-                val codigo = json.optString("tag_name").removePrefix("v").toIntOrNull()
-                    ?: return@withContext null
-                if (codigo <= BuildConfig.VERSION_CODE) return@withContext null
-
-                val assets = json.optJSONArray("assets") ?: return@withContext null
-                var url: String? = null
-                for (i in 0 until assets.length()) {
-                    val a = assets.getJSONObject(i)
-                    if (a.optString("name").endsWith(".apk")) {
-                        url = a.optString("browser_download_url")
-                        break
-                    }
+                val con = (URL(urlUltima).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 10_000
+                    readTimeout = 10_000
+                    setRequestProperty("Accept", "application/vnd.github+json")
                 }
-                if (url.isNullOrBlank()) return@withContext null
-                Versao(codigo, json.optString("name", "v$codigo"), url, json.optString("body"))
-            } finally {
-                con.disconnect()
+                try {
+                    if (con.responseCode != 200) return@withContext null
+                    val texto = con.inputStream.bufferedReader().use { it.readText() }
+                    Versao.interpretar(texto, versaoAtual)
+                } finally {
+                    con.disconnect()
+                }
+            } catch (e: Exception) {
+                null
             }
-        } catch (e: Exception) {
-            null
         }
-    }
 
     /** O Android exige que o usuário libere "instalar apps desconhecidos" para este app. */
     fun podeInstalar(ctx: Context): Boolean =
@@ -70,7 +56,7 @@ object Atualizador {
         Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${ctx.packageName}"))
 
     /** Baixa o APK mostrando o progresso (0 a 100). */
-    suspend fun baixar(ctx: Context, versao: Versao, progresso: (Int) -> Unit): File? =
+    suspend fun baixar(ctx: Context, versao: Versao.Lancamento, progresso: (Int) -> Unit): File? =
         withContext(Dispatchers.IO) {
             val pasta = File(ctx.cacheDir, "updates").apply { mkdirs() }
             pasta.listFiles()?.forEach { it.delete() } // apaga downloads antigos
@@ -102,8 +88,8 @@ object Atualizador {
                             if (n < 0) break
                             saida.write(buffer, 0, n)
                             lidos += n
-                            if (total > 0) {
-                                val p = ((lidos * 100) / total).toInt()
+                            val p = Texto.porcentagem(lidos, total)
+                            if (p >= 0) {
                                 if (p != ultimo) {
                                     ultimo = p
                                     withContext(Dispatchers.Main) { progresso(p) }
@@ -113,6 +99,12 @@ object Atualizador {
                     }
                 }
                 con.disconnect()
+                // Confere se o arquivo baixado é mesmo um APK inteiro.
+                val inicio = destino.inputStream().use { entrada -> ByteArray(2).also { entrada.read(it) } }
+                if (!Versao.pareceApk(inicio, destino.length())) {
+                    destino.delete()
+                    return@withContext null
+                }
                 destino
             } catch (e: Exception) {
                 destino.delete()

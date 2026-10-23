@@ -42,6 +42,9 @@ class LinhaAdapter(
         }
     }
 
+    /** Cópia dos itens mostrados agora (usada pelos testes automáticos). */
+    fun itensAtuais(): List<Linha> = itens.toList()
+
     override fun getItemCount() = itens.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =

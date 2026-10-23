@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import br.com.gomestech.otimizador.R
 import br.com.gomestech.otimizador.data.Aparelho
 import br.com.gomestech.otimizador.data.Marcas
+import br.com.gomestech.otimizador.logica.Saude
+import br.com.gomestech.otimizador.logica.Texto
 import com.google.android.material.button.MaterialButton
 
 /** Bateria: informações reais e atalhos para as telas certas de cada marca. */
@@ -67,8 +69,8 @@ class BateriaFragment : Fragment() {
         nivel.text = "${b.nivel}%"
         val linhas = mutableListOf(
             "Situação: " + if (b.carregando) "carregando (${b.fonteTexto})" else "na bateria",
-            "Temperatura: ${"%.1f".format(b.temperaturaC)} °C" +
-                if (b.temperaturaC >= 40f) " — quente! Deixe esfriar." else " — normal",
+            "Temperatura: ${Texto.umaCasa(b.temperaturaC)} °C" +
+                if (b.temperaturaC >= Saude.TEMPERATURA_QUENTE) " — quente! Deixe esfriar." else " — normal",
             "Saúde: ${b.saudeTexto}",
             "Tensão: ${b.voltagemMv} mV"
         )

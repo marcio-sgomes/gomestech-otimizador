@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import br.com.gomestech.otimizador.logica.Texto
 
 /** Procura fotos, vídeos e áudios grandes guardados no celular. */
 object ScannerArquivos {
@@ -20,7 +21,7 @@ object ScannerArquivos {
         val modificadoEm: Long
     ) {
         /** Vídeos e fotos do WhatsApp são os que mais enchem o celular. */
-        val doWhatsApp: Boolean get() = pasta.contains("whatsapp", ignoreCase = true)
+        val doWhatsApp: Boolean get() = Texto.ehDoWhatsApp(pasta)
     }
 
     /** Arquivos a partir deste tamanho entram na lista. */
@@ -73,7 +74,7 @@ object ScannerArquivos {
                 while (c.moveToNext()) {
                     val id = c.getLong(iId)
                     var pasta = c.getString(iPasta) ?: ""
-                    if (!q) pasta = pasta.substringBeforeLast('/', pasta) // DATA traz o caminho completo
+                    if (!q) pasta = Texto.pastaDoArquivo(pasta) // DATA traz o caminho completo
                     lista += Arquivo(
                         uri = ContentUris.withAppendedId(base, id),
                         nome = c.getString(iNome) ?: "(sem nome)",

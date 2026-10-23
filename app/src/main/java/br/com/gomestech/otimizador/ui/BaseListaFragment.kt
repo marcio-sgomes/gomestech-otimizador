@@ -37,6 +37,14 @@ abstract class BaseListaFragment : Fragment() {
     private lateinit var txtVazio: TextView
     protected lateinit var adapter: LinhaAdapter
 
+    /** true enquanto a lista está sendo analisada (usado pelos testes automáticos). */
+    @Volatile
+    var carregando: Boolean = false
+        private set
+
+    /** Itens mostrados agora (usado pelos testes automáticos). */
+    fun itensVisiveis(): List<Linha> = if (::adapter.isInitialized) adapter.itensAtuais() else emptyList()
+
     abstract val titulo: String
     abstract val explicacao: String
     abstract val textoVazio: String
@@ -94,18 +102,23 @@ abstract class BaseListaFragment : Fragment() {
         progresso.visibility = View.VISIBLE
         txtVazio.visibility = View.GONE
         txtResumo.text = getString(R.string.carregando)
+        carregando = true
         viewLifecycleOwner.lifecycleScope.launch {
             val itens = try {
                 withContext(Dispatchers.Default) { carregar() }
             } catch (e: Exception) {
                 emptyList()
             }
-            if (!isAdded) return@launch
+            if (!isAdded) {
+                carregando = false
+                return@launch
+            }
             progresso.visibility = View.GONE
             adapter.definir(itens)
             txtResumo.text = resumo(itens)
             txtVazio.text = textoVazio
             txtVazio.visibility = if (itens.isEmpty()) View.VISIBLE else View.GONE
+            carregando = false
         }
     }
 

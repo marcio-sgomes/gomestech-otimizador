@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import br.com.gomestech.otimizador.logica.Familia
+import br.com.gomestech.otimizador.logica.Marca
 
 /**
  * Atalhos para as telas de manutenção de cada marca.
@@ -18,40 +20,9 @@ import android.provider.Settings
  */
 object Marcas {
 
-    enum class Familia(val nome: String) {
-        SAMSUNG("Samsung"),
-        XIAOMI("Xiaomi / Redmi / POCO"),
-        MOTOROLA("Motorola"),
-        HUAWEI("Huawei"),
-        HONOR("Honor"),
-        OPPO("OPPO / Realme / OnePlus"),
-        VIVO("Vivo / iQOO"),
-        ASUS("Asus"),
-        LG("LG"),
-        NOKIA("Nokia"),
-        GOOGLE("Google Pixel"),
-        OUTRA("Android")
-    }
-
     data class Atalho(val titulo: String, val descricao: String, val candidatos: List<Intent>)
 
-    fun familia(): Familia {
-        val m = (Build.MANUFACTURER + " " + Build.BRAND).lowercase()
-        return when {
-            "samsung" in m -> Familia.SAMSUNG
-            "xiaomi" in m || "redmi" in m || "poco" in m -> Familia.XIAOMI
-            "motorola" in m || "lenovo" in m -> Familia.MOTOROLA
-            "honor" in m -> Familia.HONOR
-            "huawei" in m -> Familia.HUAWEI
-            "oppo" in m || "realme" in m || "oneplus" in m -> Familia.OPPO
-            "vivo" in m || "iqoo" in m -> Familia.VIVO
-            "asus" in m -> Familia.ASUS
-            "lge" in m || m.startsWith("lg") -> Familia.LG
-            "nokia" in m || "hmd" in m -> Familia.NOKIA
-            "google" in m -> Familia.GOOGLE
-            else -> Familia.OUTRA
-        }
-    }
+    fun familia(): Familia = Marca.detectar(Build.MANUFACTURER, Build.BRAND)
 
     // ---------- Montagem dos candidatos ----------
 
@@ -98,7 +69,7 @@ object Marcas {
         // Para todas as marcas: o "Files by Google" tem uma limpeza segura e oficial.
         c += app(ctx, "com.google.android.apps.nbu.files")
         c += sistema(Settings.ACTION_INTERNAL_STORAGE_SETTINGS)
-        val nome = if (f == Familia.OUTRA) "do Android" else "da ${f.nome}"
+        val nome = Marca.nomeComArtigo(f)
         return Atalho(
             titulo = "Abrir a limpeza oficial $nome",
             descricao = "Abre a ferramenta de limpeza que já vem no seu celular (é segura e feita pela própria marca).",
@@ -205,13 +176,7 @@ object Marcas {
         }
 
     /** Caminho para limpar o cache na tela de detalhes do app, conforme a marca. */
-    fun dicaCache(): String = when (familia()) {
-        Familia.SAMSUNG -> "Na tela que vai abrir, toque em “Armazenamento” e depois em “Limpar cache”."
-        Familia.XIAOMI -> "Na tela que vai abrir, toque em “Limpar dados” (ou “Armazenamento”) e escolha “Limpar cache”. Não escolha “Limpar todos os dados”."
-        Familia.MOTOROLA, Familia.GOOGLE, Familia.NOKIA ->
-            "Na tela que vai abrir, toque em “Armazenamento e cache” e depois em “Limpar cache”."
-        else -> "Na tela que vai abrir, toque em “Armazenamento” (ou “Armazenamento e cache”) e depois em “Limpar cache”. Não toque em “Limpar dados”."
-    }
+    fun dicaCache(): String = Marca.dicaCache(familia())
 
     /** Página do Files by Google na loja, caso o celular não tenha uma limpeza oficial. */
     fun intentFilesByGoogleNaLoja(): Intent =

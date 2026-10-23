@@ -6,6 +6,7 @@ import android.view.View
 import br.com.gomestech.otimizador.R
 import br.com.gomestech.otimizador.data.Permissoes
 import br.com.gomestech.otimizador.data.ScannerApps
+import br.com.gomestech.otimizador.logica.Tempo
 import br.com.gomestech.otimizador.util.Formato
 import br.com.gomestech.otimizador.util.abrirComSeguranca
 import com.google.android.material.chip.Chip
@@ -56,12 +57,9 @@ class AppsFragment : BaseListaFragment() {
         val ctx = requireContext().applicationContext
         if (!Permissoes.temAcessoAoUso(ctx)) return emptyList()
         val limite = dias
+        val agora = System.currentTimeMillis()
         return ScannerApps.escanear(ctx)
-            .filter {
-                // Nunca aberto: conta a partir da data de instalação.
-                val referencia = if (it.ultimoUso > 0) it.ultimoUso else it.instaladoEm
-                Formato.diasDesde(referencia) >= limite
-            }
+            .filter { Tempo.ehEsquecido(it.ultimoUso, it.instaladoEm, limite, agora) }
             .sortedByDescending { it.tamanhoTotal }
             .map {
                 val tamanho = if (it.tamanhoTotal > 0) " • ${Formato.tamanho(ctx, it.tamanhoTotal)}" else ""
